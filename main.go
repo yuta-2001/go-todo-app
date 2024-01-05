@@ -27,3 +27,26 @@ const (
 	collectionName	string = "todos"
 	port			string = ":9000"
 )
+
+type(
+	todoModel struct {
+		ID			bson.ObjectId	`bson:"_id, omitempty"`
+		Title		string			`bson:"title"`
+		Completed	bool			`bson:"completed"`
+		CreatedAt	time.Time		`bson:"created_at"`
+	}
+	todo struct {
+		ID			string `json:"id"`
+		Title		string `json:"title"`
+		Completed	string `json:"completed"`
+		CreatedAt	string `json:"created_at"`
+ 	}
+)
+
+
+func init() {
+	rnd = renderer.New()
+	sess, err := mgo.Dial(hostName)
+	checkErr(err)
+	db = sess.DB(dbName)
+}
