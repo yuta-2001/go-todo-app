@@ -50,3 +50,44 @@ func init() {
 	checkErr(err)
 	db = sess.DB(dbName)
 }
+
+
+func main() {
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Get("/", homeHandler)
+	r.Get("/todos", todoHandlers())
+
+	srv := &http.Server{
+		Addr: port,
+		Handler: r,
+		ReadTimeout: 60 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		IdleTimeout: 60 * time.Second,
+	}
+
+	go func() {
+		log.Println("Server is running on port", port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal(err)
+		}
+	}()
+}
+
+
+func todoHandlers() http.Handler {
+	rg := chi.NewRouter()
+	rg.Group(func(r chi.Router) {
+		r.Get("/", fetchTodos)
+		r.Post("/", createTodo)
+		r.Put("/{id}", updateTodo)
+		r.Delete("/{id}", deleteTodo)
+	})
+}
+
+
+func checkErr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
